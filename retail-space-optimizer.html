@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Space Optimizer Pro</title>
+    <meta name="description"
+        content="Retail Space Optimizer Pro — Multi-location retail space optimization for simulation games.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: { 50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81' },
+                        surface: { 800: '#1e1b2e', 850: '#181529', 900: '#110e1f' },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #110e1f 0%, #1e1b2e 50%, #181529 100%);
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-input {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        .glass-input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+            outline: none;
+        }
+
+        .glass-input.global-field {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+
+        .glass-input.global-field:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
+        }
+
+        .kpi-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.15);
+        }
+
+        .progress-track {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            height: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width .5s cubic-bezier(.4, 0, .2, 1), background .4s;
+        }
+
+        .badge-gold {
+            background: linear-gradient(135deg, #f59e0b, #eab308);
+            color: #1e1b2e;
+            font-weight: 700;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .badge-code {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            font-weight: 600;
+            font-size: 0.65rem;
+            padding: 1px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        table input[type="text"],
+        table input[type="number"] {
+            width: 100%;
+            text-align: right;
+        }
+
+        .warning-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.08));
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            animation: pulse-warning 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-warning {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px 4px rgba(239, 68, 68, 0.15);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .set-chip {
+            transition: all .2s;
+            cursor: pointer;
+        }
+
+        .set-chip:hover {
+            transform: translateY(-1px);
+        }
+
+        .set-chip.active {
+            border-color: #818cf8 !important;
+            background: rgba(99, 102, 241, 0.15) !important;
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+        }
+
+        .loc-tab {
+            transition: all .2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .loc-tab:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .loc-tab.active {
+            background: rgba(99, 102, 241, 0.12) !important;
+            border-color: #818cf8 !important;
+            color: #fff !important;
+        }
+
+        .loc-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 20%;
+            right: 20%;
+            height: 2px;
+            background: #818cf8;
+            border-radius: 2px;
+        }
+
+        .col-global-header {
+            background: rgba(139, 92, 246, 0.08);
+        }
+
+        .col-local-header {
+            background: rgba(16, 185, 129, 0.06);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 999px;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen font-sans text-gray-200 antialiased">
+
+    <!-- ═══════════════════ HEADER ═══════════════════ -->
+    <header class="sticky top-0 z-50 glass border-b border-white/5">
+        <div class="max-w-[1700px] mx-auto flex items-center justify-between px-6 py-3">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-brand-500/30">
+                    R</div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white">Retail Space Optimizer <span
+                            class="text-brand-400">Pro</span></h1>
+                    <p class="text-[0.65rem] text-gray-500 -mt-0.5 tracking-wide uppercase">Multi-Location Dashboard</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══════════════════ LOCATION TABS ═══════════════════ -->
+    <nav class="glass border-b border-white/5 sticky top-[57px] z-40">
+        <div class="max-w-[1700px] mx-auto px-6 flex items-center gap-1 overflow-x-auto">
+            <div id="locationTabs" class="flex items-center gap-1 py-1.5"></div>
+            <button id="addLocBtn" title="Add Location"
+                class="shrink-0 ml-1 w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-brand-400 hover:bg-white/5 transition-colors">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-[1700px] mx-auto px-6 py-6 grid grid-cols-1 xl:grid-cols-[1fr_440px] gap-6">
+
+        <!-- ═══════════════════ SECTION A: INPUTS ═══════════════════ -->
+        <section>
+            <!-- Product Set Selector -->
+            <div class="glass rounded-xl p-4 mb-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Product Category
+                    </h3>
+                    <span id="activeSetLabel" class="text-[0.65rem] text-brand-400 font-medium"></span>
+                </div>
+                <div class="flex flex-wrap gap-2" id="setChips"></div>
+            </div>
+
+            <!-- Location Space -->
+            <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <span id="tableLocationName">—</span>
+                    </h2>
+                    <div class="flex items-center gap-2 glass rounded-lg px-3 py-1.5">
+                        <label for="totalSpace" class="text-xs text-gray-400 whitespace-nowrap">Store Space</label>
+                        <input id="totalSpace" type="number" value="400" min="1" step="1"
+                            class="glass-input rounded-md px-2 py-1 w-24 text-sm text-white text-right font-semibold">
+                        <span class="text-xs text-gray-500">m²</span>
+                    </div>
+                </div>
+                <button id="addRowBtn"
+                    class="flex items-center gap-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-lg shadow-brand-600/20">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Add Product
+                </button>
+            </div>
+
+            <!-- Input Table -->
+            <div class="glass rounded-xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm" id="inputTable">
+                        <thead>
+                            <tr class="text-[0.68rem] uppercase tracking-wider border-b border-white/5">
+                                <th class="px-3 py-2 text-left font-semibold text-gray-500 min-w-[130px]" rowspan="2">
+                                    Product</th>
+                                <th class="px-3 py-2 text-center font-semibold text-gray-500 w-14" rowspan="2">Code</th>
+                                <th class="px-2 py-1.5 text-center font-semibold text-purple-400 col-global-header rounded-t-lg"
+                                    colspan="2">Global</th>
+                                <th class="px-2 py-1.5 text-center font-semibold text-emerald-400 col-local-header rounded-t-lg"
+                                    colspan="3">Local <span id="thLocName" class="opacity-60"></span></th>
+                                <th class="px-3 py-2 text-center font-semibold text-gray-500 w-10" rowspan="2"></th>
+                            </tr>
+                            <tr class="text-[0.62rem] uppercase tracking-wider border-b border-white/5">
+                                <th class="px-3 py-2 text-right font-semibold text-purple-400/70">COGS</th>
+                                <th class="px-3 py-2 text-right font-semibold text-purple-400/70">Dim (m²)</th>
+                                <th class="px-3 py-2 text-right font-semibold text-emerald-400/70">Price</th>
+                                <th class="px-3 py-2 text-right font-semibold text-emerald-400/70">Sales/d</th>
+                                <th class="px-3 py-2 text-right font-semibold text-emerald-400/70">Stock</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inputBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Auto Stock Days & Min Target -->
+            <div class="flex gap-3 mt-3">
+                <div class="glass rounded-xl p-3 flex items-center gap-3 shrink-0">
+                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Stock Days</p>
+                        <p id="stockDaysLabel" class="text-lg font-bold text-amber-400"><span
+                                id="stockDaysValue">—</span> <span class="text-xs font-normal text-gray-500">days</span>
+                        </p>
+                    </div>
+                    <div class="border-l border-white/10 pl-3">
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Target</p>
+                        <div class="flex items-center gap-1">
+                            <input id="minDaysTarget" type="number" value="10" min="1" max="90" step="1"
+                                class="glass-input rounded-md px-1.5 py-0.5 w-12 text-sm text-amber-300 text-right font-bold">
+                            <span class="text-xs text-gray-500">days</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl p-3 flex-1">
+                    <div class="flex items-start gap-2">
+                        <svg class="w-4 h-4 text-brand-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <p class="text-xs text-gray-400 font-medium mb-1">Valid Order Quantities (snapped up)</p>
+                            <p id="validQtyList" class="text-[0.65rem] text-gray-500 font-mono leading-relaxed"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══════════════════ SECTION B: ANALYTICS ═══════════════════ -->
+        <section class="flex flex-col gap-5">
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="kpi-card rounded-xl p-4 col-span-2">
+                    <p class="text-[0.65rem] text-gray-500 uppercase tracking-widest mb-1">Space Utilization — <span
+                            id="kpiLocName" class="text-brand-400">—</span></p>
+                    <div class="flex items-end gap-2 mb-2">
+                        <span id="kpiUtil" class="text-3xl font-extrabold text-white">0%</span>
+                    </div>
+                    <div class="progress-track">
+                        <div id="progressBar" class="progress-fill" style="width:0%"></div>
+                    </div>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-[0.65rem] text-gray-500 uppercase tracking-widest mb-1">Total Space</p>
+                    <span id="kpiTotal" class="text-xl font-bold text-white">— m²</span>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-[0.65rem] text-gray-500 uppercase tracking-widest mb-1">Used Space</p>
+                    <span id="kpiUsed" class="text-xl font-bold text-white">0 m²</span>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-[0.65rem] text-gray-500 uppercase tracking-widest mb-1">Remaining Space</p>
+                    <span id="kpiRemain" class="text-xl font-bold text-white">— m²</span>
+                </div>
+                <div class="kpi-card rounded-xl p-4">
+                    <p class="text-[0.65rem] text-gray-500 uppercase tracking-widest mb-1">Est. Daily Profit</p>
+                    <span id="kpiProfit" class="text-xl font-bold text-emerald-400">฿0</span>
+                </div>
+            </div>
+
+            <!-- Days Status -->
+            <div id="daysStatusPanel" class="hidden rounded-xl px-5 py-3 fade-in">
+                <div class="flex items-start gap-3">
+                    <span id="daysStatusIcon" class="text-xl mt-0.5 shrink-0"></span>
+                    <div class="flex-1">
+                        <p id="daysStatusTitle" class="font-semibold text-sm"></p>
+                        <p id="daysStatusMsg" class="text-xs opacity-70 mb-2"></p>
+                        <div id="demandBars"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendation Table -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                        </svg>
+                        Recommendations
+                    </h2>
+                </div>
+                <div class="glass rounded-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr
+                                    class="text-[0.68rem] text-gray-500 uppercase tracking-wider border-b border-white/5">
+                                    <th class="px-3 py-3 text-left font-semibold">Product</th>
+                                    <th class="px-3 py-3 text-right font-semibold">Profit/m²</th>
+                                    <th class="px-3 py-3 text-right font-semibold">Target Units</th>
+                                    <th class="px-3 py-3 text-right font-semibold">Space (m²)</th>
+                                    <th class="px-3 py-3 text-right font-semibold">Raw Order</th>
+                                    <th class="px-3 py-3 text-right font-semibold">Order Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ═══════════════════ RENAME MODAL ═══════════════════ -->
+    <div id="renameModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="glass rounded-2xl p-6 w-80 shadow-2xl fade-in">
+            <h3 class="text-sm font-bold text-white mb-3">Rename Location</h3>
+            <input id="renameInput" type="text"
+                class="glass-input rounded-lg px-3 py-2 w-full text-sm text-white mb-4 !text-left"
+                placeholder="Location name">
+            <div class="flex justify-end gap-2">
+                <button id="renameCancelBtn"
+                    class="px-3 py-1.5 text-xs text-gray-400 hover:text-white rounded-lg transition-colors">Cancel</button>
+                <button id="renameSaveBtn"
+                    class="px-4 py-1.5 text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-colors">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ══════════════════════════════════════════════════════════════════════
+        //  PRODUCT SETS
+        // ══════════════════════════════════════════════════════════════════════
+        const PRODUCT_SETS = {
+            electronics: {
+                label: 'Electronics', icon: '💻',
+                code_map: { 'Laptop': 'P1', 'Smartphone': 'P2', 'Witchtendo Switch': 'P3' },
+                space_usage: { 'Laptop': 0.31, 'Smartphone': 0.012, 'Witchtendo Switch': 0.024 },
+                valid_order_quantities: [100, 300, 500, 800, 1200, 2000, 3000, 4000, 5000, 6000, 8000, 10000, 12000],
+                globalDefaults: [
+                    { name: 'Laptop', cogs: 250, dim: 0.31 },
+                    { name: 'Smartphone', cogs: 170, dim: 0.012 },
+                    { name: 'Witchtendo Switch', cogs: 190, dim: 0.024 },
+                ],
+                locationDefaults: {
+                    'Chiang Mai': [
+                        { name: 'Laptop', price: 400, dailySales: 78, stock: 94 },
+                        { name: 'Smartphone', price: 250, dailySales: 144, stock: 1247 },
+                        { name: 'Witchtendo Switch', price: 310, dailySales: 13, stock: 1162 },
+                    ],
+                    'Bangkok': [
+                        { name: 'Laptop', price: 420, dailySales: 120, stock: 50 },
+                        { name: 'Smartphone', price: 260, dailySales: 300, stock: 500 },
+                        { name: 'Witchtendo Switch', price: 320, dailySales: 50, stock: 100 },
+                    ],
+                },
+                defaultLocations: [
+                    { name: 'Chiang Mai', space: 400 },
+                    { name: 'Bangkok', space: 500 },
+                ],
+            },
+            juice: {
+                label: 'Juice', icon: '🧃',
+                code_map: { 'Apple Juice': 'P1', 'Orange Juice': 'P2', 'Melon Juice': 'P3' },
+                space_usage: { 'Apple Juice': 0.0033, 'Orange Juice': 0.0033, 'Melon Juice': 0.0033 },
+                valid_order_quantities: [1000, 3000, 5000, 8000, 12000, 20000, 30000, 40000, 50000, 60000, 80000, 100000, 120000],
+                globalDefaults: [
+                    { name: 'Apple Juice', cogs: 18, dim: 0.0033 },
+                    { name: 'Orange Juice', cogs: 20, dim: 0.0033 },
+                    { name: 'Melon Juice', cogs: 22, dim: 0.0033 },
+                ],
+                defaultPrices: { 'Apple Juice': 35, 'Orange Juice': 35, 'Melon Juice': 40 },
+                locationDefaults: {},
+                defaultLocations: [{ name: 'Store A', space: 400 }],
+            },
+            mask: {
+                label: 'Mask', icon: '😷',
+                code_map: { 'Dust Mask': 'P1', 'Surgical Mask': 'P2', 'KN95': 'P3' },
+                space_usage: { 'Dust Mask': 0.0133, 'Surgical Mask': 0.0083, 'KN95': 0.012 },
+                valid_order_quantities: [1000, 3000, 5000, 8000, 12000, 20000, 30000, 40000, 50000, 60000, 80000, 100000, 120000],
+                globalDefaults: [
+                    { name: 'Dust Mask', cogs: 5, dim: 0.0133 },
+                    { name: 'Surgical Mask', cogs: 3, dim: 0.0083 },
+                    { name: 'KN95', cogs: 18, dim: 0.012 },
+                ],
+                defaultPrices: { 'Dust Mask': 15, 'Surgical Mask': 10, 'KN95': 45 },
+                locationDefaults: {},
+                defaultLocations: [{ name: 'Store A', space: 400 }],
+            },
+            car: {
+                label: 'Car', icon: '🚗',
+                code_map: { 'Sedan': 'P1', 'SUV': 'P2', 'Truck': 'P3' },
+                space_usage: { 'Sedan': 18.5, 'SUV': 23.2, 'Truck': 28 },
+                valid_order_quantities: [1, 2, 3, 4, 5, 10, 15, 20, 25, 30, 40, 50],
+                globalDefaults: [
+                    { name: 'Sedan', cogs: 780000, dim: 18.5 },
+                    { name: 'SUV', cogs: 1100000, dim: 23.2 },
+                    { name: 'Truck', cogs: 1400000, dim: 28 },
+                ],
+                defaultPrices: { 'Sedan': 950000, 'SUV': 1400000, 'Truck': 1800000 },
+                locationDefaults: {},
+                defaultLocations: [{ name: 'Showroom A', space: 800 }],
+            },
+            coffee: {
+                label: 'Coffee & Drinks', icon: '☕',
+                code_map: { 'Americano': 'P1', 'Hot Chocolate': 'P2', 'Bubble Milk Tea': 'P3' },
+                space_usage: { 'Americano': 0.005, 'Hot Chocolate': 0.005, 'Bubble Milk Tea': 0.005 },
+                valid_order_quantities: [1000, 3000, 5000, 8000, 12000, 20000, 30000, 40000, 50000, 60000, 80000, 100000, 120000],
+                globalDefaults: [
+                    { name: 'Americano', cogs: 15, dim: 0.005 },
+                    { name: 'Hot Chocolate', cogs: 20, dim: 0.005 },
+                    { name: 'Bubble Milk Tea', cogs: 18, dim: 0.005 },
+                ],
+                defaultPrices: { 'Americano': 55, 'Hot Chocolate': 65, 'Bubble Milk Tea': 60 },
+                locationDefaults: {},
+                defaultLocations: [{ name: 'Café A', space: 200 }],
+            },
+        };
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  STATE
+        // ══════════════════════════════════════════════════════════════════════
+        let activeSetKey = 'electronics';
+        let globalProducts = [];   // [{name,code,cogs,dim}]
+        let locations = [];        // [{id,name,space, items:[{productName,price,dailySales,stock}]}]
+        let activeLocIdx = 0;
+
+        const uid = () => crypto.randomUUID();
+
+        function getSet() { return PRODUCT_SETS[activeSetKey]; }
+
+        // Build state from a product set
+        function loadSet(key) {
+            activeSetKey = key;
+            const set = getSet();
+
+            // Global products
+            globalProducts = set.globalDefaults.map(g => ({
+                ...g,
+                code: set.code_map[g.name] || '',
+            }));
+
+            // Locations
+            locations = set.defaultLocations.map(loc => {
+                const locDef = set.locationDefaults[loc.name];
+                const items = globalProducts.map(gp => {
+                    const ld = locDef ? locDef.find(l => l.name === gp.name) : null;
+                    const defPrice = set.defaultPrices ? set.defaultPrices[gp.name] : undefined;
+                    return {
+                        productName: gp.name,
+                        price: ld && ld.price != null ? ld.price : (defPrice != null ? defPrice : 100),
+                        dailySales: ld ? ld.dailySales : 10,
+                        stock: ld ? ld.stock : 0,
+                    };
+                });
+                return { id: uid(), name: loc.name, space: loc.space, items };
+            });
+
+            activeLocIdx = 0;
+            fullRender();
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  DOM REFS
+        // ══════════════════════════════════════════════════════════════════════
+        const $ = id => document.getElementById(id);
+        const $locationTabs = $('locationTabs');
+        const $totalSpace = $('totalSpace');
+        const $inputBody = $('inputBody');
+        const $resultBody = $('resultBody');
+        const $kpiUtil = $('kpiUtil');
+        const $kpiTotal = $('kpiTotal');
+        const $kpiUsed = $('kpiUsed');
+        const $kpiRemain = $('kpiRemain');
+        const $kpiProfit = $('kpiProfit');
+        const $progressBar = $('progressBar');
+        const $addRowBtn = $('addRowBtn');
+        const $addLocBtn = $('addLocBtn');
+        const $setChips = $('setChips');
+        const $activeSetLabel = $('activeSetLabel');
+        const $validQtyList = $('validQtyList');
+        const $tableLocName = $('tableLocationName');
+        const $thLocName = $('thLocName');
+        const $kpiLocName = $('kpiLocName');
+        const $renameModal = $('renameModal');
+        const $renameInput = $('renameInput');
+        const $renameSaveBtn = $('renameSaveBtn');
+        const $renameCancelBtn = $('renameCancelBtn');
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  RENDER HELPERS
+        // ══════════════════════════════════════════════════════════════════════
+        function fullRender() {
+            renderSetChips();
+            renderLocationTabs();
+            renderLocationView();
+        }
+
+        function renderSetChips() {
+            $setChips.innerHTML = '';
+            for (const [key, set] of Object.entries(PRODUCT_SETS)) {
+                const chip = document.createElement('button');
+                chip.className = `set-chip glass rounded-lg px-3 py-2 flex items-center gap-2 text-sm font-medium ${key === activeSetKey ? 'active text-white' : 'text-gray-400 hover:text-gray-200'}`;
+                chip.innerHTML = `<span class="text-base">${set.icon}</span> ${set.label}`;
+                chip.onclick = () => loadSet(key);
+                $setChips.appendChild(chip);
+            }
+            $activeSetLabel.textContent = `${getSet().icon} ${getSet().label} Set Active`;
+        }
+
+        // ── Location Tabs ────────────────────────────────────────────────────
+        function renderLocationTabs() {
+            $locationTabs.innerHTML = '';
+            locations.forEach((loc, i) => {
+                const tab = document.createElement('button');
+                tab.className = `loc-tab glass rounded-t-lg px-4 py-2 text-sm font-medium flex items-center gap-2 ${i === activeLocIdx ? 'active text-white' : 'text-gray-400'}`;
+                tab.innerHTML = `
+            <svg class="w-3.5 h-3.5 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>${escHtml(loc.name)}</span>
+        `;
+                // Click = switch, dblclick = rename
+                tab.addEventListener('click', () => { activeLocIdx = i; renderLocationTabs(); renderLocationView(); });
+                tab.addEventListener('dblclick', (e) => { e.preventDefault(); openRenameModal(i); });
+
+                // Delete button (if > 1 location)
+                if (locations.length > 1) {
+                    const del = document.createElement('button');
+                    del.className = 'ml-1 text-gray-600 hover:text-red-400 transition-colors rounded p-0.5';
+                    del.title = 'Delete location';
+                    del.innerHTML = '<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+                    del.addEventListener('click', (e) => { e.stopPropagation(); deleteLocation(i); });
+                    tab.appendChild(del);
+                }
+
+                $locationTabs.appendChild(tab);
+            });
+        }
+
+        // ── Location-specific view ───────────────────────────────────────────
+        function renderLocationView() {
+            const loc = locations[activeLocIdx];
+            if (!loc) return;
+
+            $totalSpace.value = loc.space;
+            $tableLocName.textContent = loc.name;
+            $thLocName.textContent = `(${loc.name})`;
+            $kpiLocName.textContent = loc.name;
+
+            renderValidQtyInfo();
+            renderInputTable();
+            calculate();
+        }
+
+        function renderValidQtyInfo() {
+            $validQtyList.textContent = getSet().valid_order_quantities.map(q => fmtInt(q)).join('  ·  ');
+        }
+
+        // ── Input Table ──────────────────────────────────────────────────────
+        function renderInputTable() {
+            const loc = locations[activeLocIdx];
+            const set = getSet();
+            $inputBody.innerHTML = '';
+
+            globalProducts.forEach((gp, pi) => {
+                const localItem = loc.items[pi];
+                if (!localItem) return;
+                const code = gp.code || set.code_map[gp.name] || '—';
+                const dimLocked = !!set.space_usage[gp.name];
+
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-white/5 hover:bg-white/[0.02] transition-colors fade-in';
+                tr.innerHTML = `
+            <td class="px-3 py-2">
+                <input type="text" data-pi="${pi}" data-scope="global" data-f="name" value="${escHtml(gp.name)}"
+                    class="glass-input rounded-md px-2 py-1.5 text-sm text-white font-medium !text-left w-full" tabindex="0">
+            </td>
+            <td class="px-3 py-2 text-center"><span class="badge-code">${escHtml(code)}</span></td>
+            <!-- GLOBAL fields (COGS, Dim) -->
+            <td class="px-3 py-2">
+                <input type="number" data-pi="${pi}" data-scope="global" data-f="cogs" value="${gp.cogs}" min="0" step="0.01"
+                    class="glass-input global-field rounded-md px-2 py-1.5 text-sm text-purple-200" tabindex="0">
+            </td>
+            <td class="px-3 py-2">
+                <input type="number" data-pi="${pi}" data-scope="global" data-f="dim" value="${gp.dim}" min="0.001" step="0.001"
+                    class="glass-input global-field rounded-md px-2 py-1.5 text-sm text-purple-200 ${dimLocked ? 'opacity-60' : ''}" tabindex="0"
+                    ${dimLocked ? 'readonly title="Locked for preset product"' : ''}>
+            </td>
+            <!-- LOCAL fields (Price, Sales, Stock) -->
+            <td class="px-3 py-2">
+                <input type="number" data-pi="${pi}" data-scope="local" data-f="price" value="${localItem.price}" min="0" step="0.01"
+                    class="glass-input rounded-md px-2 py-1.5 text-sm text-emerald-200" tabindex="0">
+            </td>
+            <td class="px-3 py-2">
+                <input type="number" data-pi="${pi}" data-scope="local" data-f="dailySales" value="${localItem.dailySales}" min="0" step="1"
+                    class="glass-input rounded-md px-2 py-1.5 text-sm text-emerald-200" tabindex="0">
+            </td>
+            <td class="px-3 py-2">
+                <input type="number" data-pi="${pi}" data-scope="local" data-f="stock" value="${localItem.stock}" min="0" step="1"
+                    class="glass-input rounded-md px-2 py-1.5 text-sm text-emerald-200" tabindex="0">
+            </td>
+            <td class="px-3 py-2 text-center">
+                <button data-del-product="${pi}" title="Remove product"
+                    class="text-gray-600 hover:text-red-400 transition-colors p-1 rounded-lg hover:bg-red-500/10">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+            </td>
+        `;
+                $inputBody.appendChild(tr);
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  CALCULATE (per active location)
+        // ══════════════════════════════════════════════════════════════════════
+        function snapOrderQty(rawQty) {
+            if (rawQty <= 0) return 0;
+            const valids = getSet().valid_order_quantities;
+            for (const v of valids) { if (v >= rawQty) return v; }
+            return valids[valids.length - 1];
+        }
+
+        function calculate() {
+            const loc = locations[activeLocIdx];
+            if (!loc) return;
+            const totalSpace = loc.space;
+            const set = getSet();
+            const minTarget = parseFloat($('minDaysTarget').value) || 10;
+
+            // Gather product data
+            const products = globalProducts.map((gp, pi) => {
+                const li = loc.items[pi];
+                if (!li) return null;
+                const profitPerUnit = li.price - gp.cogs;
+                const profitPerSqm = gp.dim > 0 ? profitPerUnit / gp.dim : 0;
+                const spacePerDay = li.dailySales * gp.dim;  // m²/day this product consumes
+                const code = gp.code || set.code_map[gp.name] || '\u2014';
+                return { name: gp.name, code, dim: gp.dim, profitPerUnit, profitPerSqm, dailySales: li.dailySales, stock: li.stock, spacePerDay };
+            }).filter(Boolean);
+
+            // Auto-calculate D = TotalSpace / \u03a3(Sales_i \u00d7 Dim_i)
+            const demandSpacePerDay = products.reduce((s, p) => s + p.spacePerDay, 0);
+            const autoDays = demandSpacePerDay > 0 ? totalSpace / demandSpacePerDay : 0;
+
+            // Update Stock Days badge with color
+            const $sdVal = $('stockDaysValue');
+            const $sdLabel = $('stockDaysLabel');
+            $sdVal.textContent = autoDays.toFixed(1);
+            if (autoDays >= minTarget) {
+                $sdLabel.className = 'text-lg font-bold text-emerald-400';
+            } else if (autoDays >= minTarget * 0.7) {
+                $sdLabel.className = 'text-lg font-bold text-amber-400';
+            } else {
+                $sdLabel.className = 'text-lg font-bold text-red-400';
+            }
+
+            const results = products.map(p => {
+                const targetUnits = Math.floor(p.dailySales * autoDays);
+                const spaceConsumed = targetUnits * p.dim;
+                const rawOrder = Math.max(0, targetUnits - p.stock);
+                const snappedOrder = snapOrderQty(rawOrder);
+                const dailyProfit = p.dailySales * p.profitPerUnit;
+                return { ...p, targetUnits, spaceConsumed, rawOrder, snappedOrder, dailyProfit };
+            });
+
+            // KPIs
+            const totalUsed = results.reduce((s, r) => s + r.spaceConsumed, 0);
+            const remaining = totalSpace - totalUsed;
+            const utilPct = totalSpace > 0 ? (totalUsed / totalSpace) * 100 : 0;
+            const totalProfit = results.reduce((s, r) => s + r.dailyProfit, 0);
+
+            $kpiTotal.textContent = `${fmt(totalSpace)} m\u00b2`;
+            $kpiUsed.textContent = `${fmt(totalUsed)} m\u00b2`;
+            $kpiRemain.textContent = `${fmt(remaining)} m\u00b2`;
+            $kpiUtil.textContent = `${utilPct.toFixed(1)}%`;
+            $kpiProfit.textContent = `\u0e3f${fmtInt(totalProfit)}`;
+
+            $kpiUtil.className = 'text-3xl font-extrabold text-emerald-400';
+            const barW = Math.min(utilPct, 100);
+            $progressBar.style.width = barW + '%';
+            $progressBar.style.background = 'linear-gradient(90deg,#10b981,#34d399)';
+            $kpiRemain.className = 'text-xl font-bold text-white';
+
+            // ── Days Status Analysis ─────────────────────────────────────
+            const $panel = $('daysStatusPanel');
+            const $icon = $('daysStatusIcon');
+            const $title = $('daysStatusTitle');
+            const $msg = $('daysStatusMsg');
+            const $bars = $('demandBars');
+            $panel.classList.remove('hidden');
+
+            // Max budget for target days: Space/MinDays
+            const budgetPerDay = totalSpace / minTarget;  // max m²/day allowed
+            const overBudget = demandSpacePerDay - budgetPerDay;
+
+            if (autoDays >= minTarget) {
+                $panel.style.background = 'rgba(16,185,129,0.08)';
+                $panel.style.border = '1px solid rgba(16,185,129,0.2)';
+                $icon.textContent = '\u2705';
+                $title.className = 'font-semibold text-sm text-emerald-300';
+                $title.textContent = `Target met! ${autoDays.toFixed(1)} days \u2265 ${minTarget} days`;
+                $msg.className = 'text-xs text-emerald-400/70 mb-2';
+                $msg.textContent = `Daily space demand: ${fmt(demandSpacePerDay)} m\u00b2/day (budget: ${fmt(budgetPerDay)} m\u00b2/day)`;
+            } else {
+                $panel.style.background = 'rgba(239,68,68,0.08)';
+                $panel.style.border = '1px solid rgba(239,68,68,0.2)';
+                $icon.textContent = '\u26a0\ufe0f';
+                $title.className = 'font-semibold text-sm text-red-300';
+                $title.textContent = `Need to reduce ${fmt(overBudget)} m\u00b2/day to reach ${minTarget} days`;
+                $msg.className = 'text-xs text-red-400/70 mb-2';
+                $msg.textContent = `Current: ${fmt(demandSpacePerDay)} m\u00b2/day \u2192 Budget: ${fmt(budgetPerDay)} m\u00b2/day`;
+            }
+
+            // Per-product space/day bars (sorted largest first)
+            const sortedBySpaceDay = [...results].sort((a, b) => b.spacePerDay - a.spacePerDay);
+            const maxSpd = Math.max(...sortedBySpaceDay.map(r => r.spacePerDay));
+            $bars.innerHTML = '';
+            sortedBySpaceDay.forEach(r => {
+                const pct = maxSpd > 0 ? (r.spacePerDay / maxSpd) * 100 : 0;
+                const share = demandSpacePerDay > 0 ? (r.spacePerDay / demandSpacePerDay) * 100 : 0;
+                const isNeg = r.profitPerSqm <= 0;
+                $bars.innerHTML += `
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[0.6rem] text-gray-400 w-28 shrink-0 truncate" title="${escHtml(r.name)}">
+                            <span class="badge-code mr-1">${escHtml(r.code)}</span>${escHtml(r.name)}
+                        </span>
+                        <div class="flex-1 h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full rounded-full transition-all" style="width:${pct}%;background:${isNeg ? '#ef4444' : autoDays >= minTarget ? '#10b981' : '#f59e0b'}"></div>
+                        </div>
+                        <span class="text-[0.6rem] font-mono ${isNeg ? 'text-red-400' : 'text-gray-500'} w-20 text-right shrink-0">${fmt(r.spacePerDay)} m\u00b2/d</span>
+                        <span class="text-[0.6rem] font-semibold w-10 text-right shrink-0 ${share > 50 ? 'text-amber-400' : 'text-gray-600'}">${share.toFixed(0)}%</span>
+                    </div>`;
+            });
+
+            // Recommendation table
+            const maxP = Math.max(...results.map(r => r.profitPerSqm));
+            $resultBody.innerHTML = '';
+            const sorted = [...results].sort((a, b) => b.profitPerSqm - a.profitPerSqm);
+            sorted.forEach((r, rank) => {
+                const isTop = r.profitPerSqm === maxP && r.profitPerSqm > 0;
+                const tr = document.createElement('tr');
+                tr.className = `border-b border-white/5 transition-colors ${isTop ? 'bg-amber-500/[0.06]' : 'hover:bg-white/[0.02]'}`;
+                tr.innerHTML = `
+            <td class="px-3 py-2.5 font-medium text-white">
+                <div class="flex items-center gap-2">
+                    ${isTop ? '<span class="badge-gold">⭐ #1</span>' : `<span class="text-gray-600 text-xs font-semibold">#${rank + 1}</span>`}
+                    <span class="badge-code">${escHtml(r.code)}</span>
+                    ${escHtml(r.name)}
+                </div>
+            </td>
+            <td class="px-3 py-2.5 text-right ${isTop ? 'text-amber-300 font-bold' : 'text-gray-300'}">${fmt(r.profitPerSqm)}</td>
+            <td class="px-3 py-2.5 text-right text-emerald-400 font-semibold">${fmtInt(r.targetUnits)}</td>
+            <td class="px-3 py-2.5 text-right text-gray-300">${fmt(r.spaceConsumed)}</td>
+            <td class="px-3 py-2.5 text-right text-gray-500">${fmtInt(r.rawOrder)}</td>
+            <td class="px-3 py-2.5 text-right font-semibold ${r.snappedOrder > 0 ? 'text-brand-400' : 'text-gray-500'}">${fmtInt(r.snappedOrder)}</td>
+        `;
+                $resultBody.appendChild(tr);
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  HELPERS
+        // ══════════════════════════════════════════════════════════════════════
+        function fmt(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function fmtInt(n) { return Number(Math.round(n)).toLocaleString('en-US'); }
+        function escHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  LOCATION MANAGEMENT
+        // ══════════════════════════════════════════════════════════════════════
+        function addLocation() {
+            const n = locations.length + 1;
+            const set = getSet();
+            const items = globalProducts.map(gp => ({
+                productName: gp.name,
+                price: set.defaultPrices ? (set.defaultPrices[gp.name] || 100) : 100,
+                dailySales: 10,
+                stock: 0,
+            }));
+            locations.push({ id: uid(), name: `Location ${n}`, space: 400, items });
+            activeLocIdx = locations.length - 1;
+            renderLocationTabs();
+            renderLocationView();
+        }
+
+        function deleteLocation(i) {
+            if (locations.length <= 1) return;
+            locations.splice(i, 1);
+            if (activeLocIdx >= locations.length) activeLocIdx = locations.length - 1;
+            renderLocationTabs();
+            renderLocationView();
+        }
+
+        // Rename modal
+        let renameTargetIdx = -1;
+        function openRenameModal(i) {
+            renameTargetIdx = i;
+            $renameInput.value = locations[i].name;
+            $renameModal.classList.remove('hidden');
+            $renameModal.classList.add('flex');
+            setTimeout(() => { $renameInput.focus(); $renameInput.select(); }, 50);
+        }
+        function closeRenameModal() {
+            $renameModal.classList.add('hidden');
+            $renameModal.classList.remove('flex');
+            renameTargetIdx = -1;
+        }
+        $renameSaveBtn.addEventListener('click', () => {
+            if (renameTargetIdx >= 0 && $renameInput.value.trim()) {
+                locations[renameTargetIdx].name = $renameInput.value.trim();
+                closeRenameModal();
+                renderLocationTabs();
+                renderLocationView();
+            }
+        });
+        $renameCancelBtn.addEventListener('click', closeRenameModal);
+        $renameInput.addEventListener('keydown', e => { if (e.key === 'Enter') $renameSaveBtn.click(); if (e.key === 'Escape') closeRenameModal(); });
+        $renameModal.addEventListener('click', e => { if (e.target === $renameModal) closeRenameModal(); });
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  EVENT DELEGATION
+        // ══════════════════════════════════════════════════════════════════════
+
+        // Input table changes
+        $inputBody.addEventListener('input', e => {
+            const el = e.target;
+            const pi = parseInt(el.dataset.pi);
+            const scope = el.dataset.scope;
+            const f = el.dataset.f;
+            if (isNaN(pi) || !scope || !f) return;
+
+            if (scope === 'global') {
+                if (f === 'name') {
+                    const oldName = globalProducts[pi].name;
+                    const newName = el.value;
+                    globalProducts[pi].name = newName;
+                    // Update all location items
+                    locations.forEach(loc => { if (loc.items[pi]) loc.items[pi].productName = newName; });
+                    // Update code if matches preset
+                    const set = getSet();
+                    if (set.code_map[newName]) {
+                        globalProducts[pi].code = set.code_map[newName];
+                        globalProducts[pi].dim = set.space_usage[newName];
+                    }
+                } else {
+                    globalProducts[pi][f] = parseFloat(el.value) || 0;
+                }
+            } else {
+                // local
+                const loc = locations[activeLocIdx];
+                if (loc.items[pi]) {
+                    loc.items[pi][f] = parseFloat(el.value) || 0;
+                }
+            }
+            calculate();
+        });
+
+        // Delete product (from all locations)
+        $inputBody.addEventListener('click', e => {
+            const btn = e.target.closest('[data-del-product]');
+            if (!btn) return;
+            const pi = parseInt(btn.dataset.delProduct);
+            globalProducts.splice(pi, 1);
+            locations.forEach(loc => loc.items.splice(pi, 1));
+            renderInputTable();
+            calculate();
+        });
+
+        // Total space (local to location)
+        $totalSpace.addEventListener('input', () => {
+            const loc = locations[activeLocIdx];
+            if (loc) loc.space = parseFloat($totalSpace.value) || 1;
+            calculate();
+        });
+
+        // Min days target
+        $('minDaysTarget').addEventListener('input', () => calculate());
+
+        // Add product
+        $addRowBtn.addEventListener('click', () => {
+            const set = getSet();
+            const existingNames = new Set(globalProducts.map(g => g.name));
+
+            let newGlobal = null;
+            for (const g of set.globalDefaults) {
+                if (!existingNames.has(g.name)) {
+                    newGlobal = g;
+                    break;
+                }
+            }
+
+            if (newGlobal) {
+                globalProducts.push({ ...newGlobal, code: set.code_map[newGlobal.name] || '' });
+            } else {
+                globalProducts.push({ name: 'New Product', code: '', cogs: 60, dim: 0.05 });
+            }
+
+            const pName = globalProducts[globalProducts.length - 1].name;
+            locations.forEach(loc => {
+                // Try to get location-specific defaults
+                const locDef = set.locationDefaults[loc.name];
+                const ld = locDef ? locDef.find(l => l.name === pName) : null;
+                const defPrice = set.defaultPrices ? (set.defaultPrices[pName] || 100) : 100;
+                loc.items.push({
+                    productName: pName,
+                    price: ld && ld.price != null ? ld.price : defPrice,
+                    dailySales: ld ? ld.dailySales : 10,
+                    stock: ld ? ld.stock : 0,
+                });
+            });
+
+            renderInputTable();
+            calculate();
+            const inputs = $inputBody.querySelectorAll('input[data-f="name"]');
+            if (inputs.length) { const last = inputs[inputs.length - 1]; last.focus(); last.select(); }
+        });
+
+        // Add location
+        $addLocBtn.addEventListener('click', addLocation);
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  INIT
+        // ══════════════════════════════════════════════════════════════════════
+        loadSet('electronics');
+    </script>
+</body>
+
+</html>
