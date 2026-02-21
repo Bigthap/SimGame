@@ -254,9 +254,21 @@
                         </svg>
                         Product Category
                     </h3>
-                    <span id="activeSetLabel" class="text-[0.65rem] text-brand-400 font-medium"></span>
+                    <div class="flex items-center gap-2">
+                        <span id="activeSetLabel" class="text-[0.65rem] text-brand-400 font-medium"></span>
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+                        <button id="csvUploadBtn"
+                            class="flex items-center gap-1.5 bg-emerald-600/80 hover:bg-emerald-500 text-white text-[0.65rem] font-semibold px-2.5 py-1 rounded-lg transition-colors shadow-lg shadow-emerald-600/20">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Upload CSV
+                        </button>
+                    </div>
                 </div>
                 <div class="flex flex-wrap gap-2" id="setChips"></div>
+                <div id="csvStatus" class="hidden mt-2 text-xs rounded-lg px-3 py-2 fade-in"></div>
             </div>
 
             <!-- Location Space -->
@@ -383,50 +395,96 @@
                 </div>
             </div>
 
-            <!-- Days Status -->
-            <div id="daysStatusPanel" class="hidden rounded-xl px-5 py-3 fade-in">
-                <div class="flex items-start gap-3">
-                    <span id="daysStatusIcon" class="text-xl mt-0.5 shrink-0"></span>
-                    <div class="flex-1">
-                        <p id="daysStatusTitle" class="font-semibold text-sm"></p>
-                        <p id="daysStatusMsg" class="text-xs opacity-70 mb-2"></p>
-                        <div id="demandBars"></div>
+            <!-- Revenue & Profit Projection -->
+            <div class="glass rounded-xl p-4">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-3">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Revenue & Profit Projection
+                </h3>
+                <div class="grid grid-cols-2 gap-2 mb-3">
+                    <div class="bg-white/[0.03] rounded-lg px-3 py-2">
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Daily Revenue</p>
+                        <span id="projRevenue" class="text-lg font-bold text-white">฿0</span>
+                    </div>
+                    <div class="bg-white/[0.03] rounded-lg px-3 py-2">
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Daily COGS</p>
+                        <span id="projCogs" class="text-lg font-bold text-red-400">฿0</span>
+                    </div>
+                    <div class="bg-white/[0.03] rounded-lg px-3 py-2">
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Margin</p>
+                        <span id="projMargin" class="text-lg font-bold text-amber-400">0%</span>
+                    </div>
+                    <div class="bg-white/[0.03] rounded-lg px-3 py-2">
+                        <p class="text-[0.6rem] text-gray-500 uppercase tracking-widest">Order Cost</p>
+                        <span id="projOrderCost" class="text-lg font-bold text-gray-300">฿0</span>
                     </div>
                 </div>
-            </div>
-
-            <!-- Recommendation Table -->
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                        <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                        </svg>
-                        Recommendations
-                    </h2>
-                </div>
-                <div class="glass rounded-xl overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-sm">
-                            <thead>
-                                <tr
-                                    class="text-[0.68rem] text-gray-500 uppercase tracking-wider border-b border-white/5">
-                                    <th class="px-3 py-3 text-left font-semibold">Product</th>
-                                    <th class="px-3 py-3 text-right font-semibold">Profit/m²</th>
-                                    <th class="px-3 py-3 text-right font-semibold">Target Units</th>
-                                    <th class="px-3 py-3 text-right font-semibold">Space (m²)</th>
-                                    <th class="px-3 py-3 text-right font-semibold">Raw Order</th>
-                                    <th class="px-3 py-3 text-right font-semibold">Order Qty</th>
-                                </tr>
-                            </thead>
-                            <tbody id="resultBody"></tbody>
-                        </table>
-                    </div>
-                </div>
+                <div id="profitBars"></div>
             </div>
         </section>
     </main>
+
+    <!-- ═══════════════════ FULL-WIDTH: DAYS STATUS + RECOMMENDATIONS ═══════════════════ -->
+    <div class="max-w-[1700px] mx-auto px-6 pb-6 flex flex-col gap-5">
+        <!-- Days Status -->
+        <div id="daysStatusPanel" class="hidden rounded-xl px-5 py-3 fade-in">
+            <div class="flex items-start gap-3">
+                <span id="daysStatusIcon" class="text-xl mt-0.5 shrink-0"></span>
+                <div class="flex-1">
+                    <p id="daysStatusTitle" class="font-semibold text-sm"></p>
+                    <p id="daysStatusMsg" class="text-xs opacity-70 mb-2"></p>
+                    <div id="demandBars"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Insights -->
+        <div id="insightsPanel" class="hidden fade-in">
+            <div class="flex items-center gap-2 mb-3">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                    Smart Insights
+                </h2>
+                <span id="insightsCount"
+                    class="text-[0.6rem] font-bold bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full"></span>
+            </div>
+            <div id="insightsList" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2"></div>
+        </div>
+
+        <!-- Recommendation Table -->
+        <div>
+            <div class="flex items-center justify-between mb-3">
+                <h2 class="text-sm font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                    <svg class="w-4 h-4 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Recommendations
+                </h2>
+            </div>
+            <div class="glass rounded-xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-[0.68rem] text-gray-500 uppercase tracking-wider border-b border-white/5">
+                            <th class="px-3 py-3 text-left font-semibold">Product</th>
+                            <th class="px-3 py-3 text-right font-semibold">Profit/m²</th>
+                            <th class="px-3 py-3 text-right font-semibold">Target Units</th>
+                            <th class="px-3 py-3 text-right font-semibold">Space (m²)</th>
+                            <th class="px-3 py-3 text-right font-semibold">Raw Order</th>
+                            <th class="px-3 py-3 text-right font-semibold">Order Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <!-- ═══════════════════ RENAME MODAL ═══════════════════ -->
     <div id="renameModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -542,29 +600,43 @@
         let locations = [];        // [{id,name,space, items:[{productName,price,dailySales,stock}]}]
         let activeLocIdx = 0;
 
+        // Cache: stores user-modified state per product set so switching back preserves data
+        const stateCache = {};  // { [setKey]: { globalProducts, locations, activeLocIdx } }
+
         const uid = () => crypto.randomUUID();
 
         function getSet() { return PRODUCT_SETS[activeSetKey]; }
 
-        // Build state from a product set
-        function loadSet(key) {
-            activeSetKey = key;
-            const set = getSet();
+        // Deep-clone helper for state objects
+        function cloneState(gp, locs, idx) {
+            return {
+                globalProducts: JSON.parse(JSON.stringify(gp)),
+                locations: JSON.parse(JSON.stringify(locs)),
+                activeLocIdx: idx,
+            };
+        }
 
-            // Global products
-            globalProducts = set.globalDefaults.map(g => ({
+        // Save current state to cache before switching away
+        function saveCurrentState() {
+            if (activeSetKey && globalProducts.length > 0) {
+                stateCache[activeSetKey] = cloneState(globalProducts, locations, activeLocIdx);
+            }
+        }
+
+        // Build fresh state from a product set definition
+        function buildFreshState(set) {
+            const gp = set.globalDefaults.map(g => ({
                 ...g,
                 code: set.code_map[g.name] || '',
             }));
 
-            // Locations
-            locations = set.defaultLocations.map(loc => {
+            const locs = set.defaultLocations.map(loc => {
                 const locDef = set.locationDefaults[loc.name];
-                const items = globalProducts.map(gp => {
-                    const ld = locDef ? locDef.find(l => l.name === gp.name) : null;
-                    const defPrice = set.defaultPrices ? set.defaultPrices[gp.name] : undefined;
+                const items = gp.map(gpItem => {
+                    const ld = locDef ? locDef.find(l => l.name === gpItem.name) : null;
+                    const defPrice = set.defaultPrices ? set.defaultPrices[gpItem.name] : undefined;
                     return {
-                        productName: gp.name,
+                        productName: gpItem.name,
                         price: ld && ld.price != null ? ld.price : (defPrice != null ? defPrice : 100),
                         dailySales: ld ? ld.dailySales : 10,
                         stock: ld ? ld.stock : 0,
@@ -573,7 +645,31 @@
                 return { id: uid(), name: loc.name, space: loc.space, items };
             });
 
-            activeLocIdx = 0;
+            return { globalProducts: gp, locations: locs, activeLocIdx: 0 };
+        }
+
+        // Load a product set — restores from cache if available, otherwise builds fresh
+        function loadSet(key) {
+            // Save current state before switching
+            saveCurrentState();
+
+            activeSetKey = key;
+            const set = getSet();
+
+            if (stateCache[key]) {
+                // Restore cached state
+                const cached = stateCache[key];
+                globalProducts = JSON.parse(JSON.stringify(cached.globalProducts));
+                locations = JSON.parse(JSON.stringify(cached.locations));
+                activeLocIdx = cached.activeLocIdx;
+            } else {
+                // Build from defaults
+                const fresh = buildFreshState(set);
+                globalProducts = fresh.globalProducts;
+                locations = fresh.locations;
+                activeLocIdx = fresh.activeLocIdx;
+            }
+
             fullRender();
         }
 
@@ -751,7 +847,7 @@
                 const profitPerSqm = gp.dim > 0 ? profitPerUnit / gp.dim : 0;
                 const spacePerDay = li.dailySales * gp.dim;  // m²/day this product consumes
                 const code = gp.code || set.code_map[gp.name] || '\u2014';
-                return { name: gp.name, code, dim: gp.dim, profitPerUnit, profitPerSqm, dailySales: li.dailySales, stock: li.stock, spacePerDay };
+                return { name: gp.name, code, dim: gp.dim, price: li.price, cogs: gp.cogs, profitPerUnit, profitPerSqm, dailySales: li.dailySales, stock: li.stock, spacePerDay };
             }).filter(Boolean);
 
             // Auto-calculate D = TotalSpace / \u03a3(Sales_i \u00d7 Dim_i)
@@ -796,6 +892,170 @@
             $progressBar.style.width = barW + '%';
             $progressBar.style.background = 'linear-gradient(90deg,#10b981,#34d399)';
             $kpiRemain.className = 'text-xl font-bold text-white';
+
+            // ── Revenue & Profit Projection ──────────────────────────────
+            const dailyRevenue = results.reduce((s, r) => s + r.dailySales * r.price, 0);
+            const dailyCogs = results.reduce((s, r) => s + r.dailySales * r.cogs, 0);
+            const dailyNetProfit = dailyRevenue - dailyCogs;
+            const marginPct = dailyRevenue > 0 ? (dailyNetProfit / dailyRevenue) * 100 : 0;
+            const orderCost = results.reduce((s, r) => s + r.snappedOrder * r.cogs, 0);
+
+            $('projRevenue').textContent = `\u0e3f${fmtInt(dailyRevenue)}`;
+            $('projCogs').textContent = `\u0e3f${fmtInt(dailyCogs)}`;
+            $('projOrderCost').textContent = `\u0e3f${fmtInt(orderCost)}`;
+
+            const $projMargin = $('projMargin');
+            $projMargin.textContent = `${marginPct.toFixed(1)}%`;
+            if (marginPct >= 30) {
+                $projMargin.className = 'text-lg font-bold text-emerald-400';
+            } else if (marginPct >= 10) {
+                $projMargin.className = 'text-lg font-bold text-amber-400';
+            } else {
+                $projMargin.className = 'text-lg font-bold text-red-400';
+            }
+
+            // Per-product profit bars
+            const $profitBars = $('profitBars');
+            const sortedByProfit = [...results].sort((a, b) => b.dailyProfit - a.dailyProfit);
+            const maxAbsProfit = Math.max(...sortedByProfit.map(r => Math.abs(r.dailyProfit)), 1);
+            $profitBars.innerHTML = '';
+            sortedByProfit.forEach(r => {
+                const pct = (Math.abs(r.dailyProfit) / maxAbsProfit) * 100;
+                const isLoss = r.profitPerUnit < 0;
+                const profitPerDay = r.dailyProfit;
+                const barColor = isLoss ? '#ef4444' : '#10b981';
+                $profitBars.innerHTML += `
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[0.6rem] text-gray-400 w-24 shrink-0 truncate" title="${escHtml(r.name)}">
+                            <span class="badge-code mr-1">${escHtml(r.code)}</span>${escHtml(r.name)}
+                        </span>
+                        <div class="flex-1 h-3 rounded-full bg-white/5 overflow-hidden">
+                            <div class="h-full rounded-full transition-all" style="width:${pct}%;background:${barColor}"></div>
+                        </div>
+                        <span class="text-[0.6rem] font-mono ${isLoss ? 'text-red-400' : 'text-emerald-400'} w-16 text-right shrink-0">${isLoss ? '-' : '+'}\u0e3f${fmtInt(Math.abs(profitPerDay))}</span>
+                    </div>`;
+            });
+
+            // ── Smart Insights ──────────────────────────────────────────────
+            const insights = [];
+            const locName = loc ? loc.name : '';
+
+            // Thresholds
+            const avgDailySales = results.length > 0 ? results.reduce((s, r) => s + r.dailySales, 0) / results.length : 0;
+
+            results.forEach(r => {
+                const stockDaysLeft = r.dailySales > 0 ? r.stock / r.dailySales : Infinity;
+                const unitMargin = r.price > 0 ? ((r.price - r.cogs) / r.price) * 100 : 0;
+
+                // 1. ขายขาดทุน
+                if (r.profitPerUnit < 0) {
+                    const minPrice = Math.ceil(r.cogs * 1.1);
+                    insights.push({
+                        severity: 'critical',
+                        icon: '🚨',
+                        title: `${r.name} กำลังขายขาดทุน!`,
+                        detail: `ราคา ฿${fmtInt(r.price)} < ต้นทุน ฿${fmtInt(r.cogs)} → ขาดทุน ฿${fmtInt(Math.abs(r.profitPerUnit))}/ชิ้น (฿${fmtInt(Math.abs(r.dailyProfit))}/วัน)`,
+                        action: `ขึ้นราคาอย่างน้อย ฿${fmtInt(minPrice)} หรือเอาสินค้าออก`,
+                    });
+                }
+                // 2. กำไรต่ำ
+                else if (unitMargin > 0 && unitMargin < 15) {
+                    insights.push({
+                        severity: 'warning',
+                        icon: '⚠️',
+                        title: `${r.name} กำไรต่ำ (${unitMargin.toFixed(0)}%)`,
+                        detail: `ราคา ฿${fmtInt(r.price)}, ต้นทุน ฿${fmtInt(r.cogs)} → กำไรแค่ ฿${fmtInt(r.profitPerUnit)}/ชิ้น`,
+                        action: `ควรขึ้นราคาเพื่อเพิ่มกำไร`,
+                    });
+                }
+
+                // 3. ไม่มียอดขาย
+                if (r.dailySales === 0) {
+                    insights.push({
+                        severity: 'warning',
+                        icon: '💤',
+                        title: `${r.name} ไม่มียอดขาย`,
+                        detail: `ขายไม่ได้เลย — ใช้พื้นที่โดยไม่สร้างรายได้`,
+                        action: `ลดราคาลงมาก ๆ หรือเอาสินค้าออก`,
+                    });
+                }
+
+                // 4. กินพื้นที่เยอะเกินไป
+                if (demandSpacePerDay > 0) {
+                    const spaceShare = (r.spacePerDay / demandSpacePerDay) * 100;
+                    if (spaceShare > 60 && results.length > 1) {
+                        insights.push({
+                            severity: 'info',
+                            icon: '📐',
+                            title: `${r.name} ใช้พื้นที่มากถึง ${spaceShare.toFixed(0)}%`,
+                            detail: `ใช้ ${fmt(r.spacePerDay)} m²/วัน จากทั้งหมด ${fmt(demandSpacePerDay)} m²/วัน`,
+                            action: `พื้นที่ส่วนใหญ่ถูกใช้โดยสินค้านี้ ทำให้สินค้าอื่นมี Stock Days น้อยลง`,
+                        });
+                    }
+                }
+
+                // 5. Demand ต่ำมาก → แนะนำลดราคา
+                if (avgDailySales > 0 && r.dailySales > 0 && r.dailySales < avgDailySales * 0.25 && r.profitPerUnit > 0) {
+                    insights.push({
+                        severity: 'info',
+                        icon: '📉',
+                        title: `${r.name} ยอดขายต่ำมาก`,
+                        detail: `ขายได้แค่ ${fmtInt(r.dailySales)}/วัน เทียบค่าเฉลี่ย ${fmtInt(avgDailySales)}/วัน (${((r.dailySales / avgDailySales) * 100).toFixed(0)}%)`,
+                        action: `ลองลดราคาจาก ฿${fmtInt(r.price)} เพื่อกระตุ้นยอดขาย`,
+                    });
+                }
+            });
+
+            // 6. ขาดทุนรวมทั้ง Location
+            if (marginPct < 0) {
+                insights.push({
+                    severity: 'critical',
+                    icon: '💸',
+                    title: `${locName} ขาดทุนรวม!`,
+                    detail: `ขาดทุนวันละ ฿${fmtInt(Math.abs(dailyNetProfit))} — รายได้ ฿${fmtInt(dailyRevenue)} < ต้นทุน ฿${fmtInt(dailyCogs)}`,
+                    action: `ตรวจสอบราคาสินค้าทุกตัวด่วน`,
+                });
+            }
+
+            // Render insights
+            const $insPanel = $('insightsPanel');
+            const $insList = $('insightsList');
+            const $insCount = $('insightsCount');
+
+            if (insights.length > 0) {
+                $insPanel.classList.remove('hidden');
+                $insCount.textContent = `${insights.length} รายการ`;
+
+                // Sort: critical first, then warning, then info
+                const severityOrder = { critical: 0, warning: 1, info: 2 };
+                insights.sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+
+                const colorMap = {
+                    critical: { bg: 'bg-red-500/8', border: 'border-red-500/25', title: 'text-red-400', action: 'text-red-300' },
+                    warning: { bg: 'bg-amber-500/8', border: 'border-amber-500/25', title: 'text-amber-400', action: 'text-amber-300' },
+                    info: { bg: 'bg-blue-500/8', border: 'border-blue-500/25', title: 'text-blue-400', action: 'text-blue-300' },
+                };
+
+                $insList.innerHTML = insights.map(ins => {
+                    const c = colorMap[ins.severity];
+                    return `
+                        <div class="${c.bg} ${c.border} border rounded-lg px-3 py-2.5">
+                            <div class="flex items-start gap-2">
+                                <span class="text-sm mt-0.5 shrink-0">${ins.icon}</span>
+                                <div class="min-w-0">
+                                    <p class="${c.title} text-xs font-semibold mb-0.5">${escHtml(ins.title)}</p>
+                                    <p class="text-gray-400 text-[0.65rem] mb-1">${escHtml(ins.detail)}</p>
+                                    <p class="${c.action} text-[0.65rem] font-medium flex items-center gap-1">
+                                        <svg class="w-3 h-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                                        ${escHtml(ins.action)}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>`;
+                }).join('');
+            } else {
+                $insPanel.classList.add('hidden');
+            }
 
             // ── Days Status Analysis ─────────────────────────────────────
             const $panel = $('daysStatusPanel');
@@ -1033,6 +1293,171 @@
 
         // Add location
         $addLocBtn.addEventListener('click', addLocation);
+
+        // ══════════════════════════════════════════════════════════════════════
+        //  CSV IMPORT
+        // ══════════════════════════════════════════════════════════════════════
+        $('csvUploadBtn').addEventListener('click', () => $('csvFileInput').click());
+
+        $('csvFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    importCSV(ev.target.result, file.name);
+                } catch (err) {
+                    showCsvStatus('error', `❌ Import failed: ${err.message}`);
+                }
+            };
+            reader.readAsText(file);
+            e.target.value = ''; // reset so same file can be re-uploaded
+        });
+
+        function showCsvStatus(type, msg) {
+            const $s = $('csvStatus');
+            $s.classList.remove('hidden');
+            if (type === 'success') {
+                $s.className = 'mt-2 text-xs rounded-lg px-3 py-2 fade-in bg-emerald-500/10 border border-emerald-500/30 text-emerald-400';
+            } else {
+                $s.className = 'mt-2 text-xs rounded-lg px-3 py-2 fade-in bg-red-500/10 border border-red-500/30 text-red-400';
+            }
+            $s.innerHTML = msg;
+            setTimeout(() => $s.classList.add('hidden'), 8000);
+        }
+
+        function importCSV(csvText, fileName) {
+            const set = getSet();
+            const productNames = new Set(set.globalDefaults.map(g => g.name));
+
+            // Parse CSV lines
+            const lines = csvText.trim().split(/\r?\n/);
+            if (lines.length < 2) throw new Error('CSV file is empty or has no data rows');
+
+            // Parse header — handle quoted headers with spaces
+            const parseRow = (line) => {
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    if (ch === '"') { inQuotes = !inQuotes; }
+                    else if (ch === ',' && !inQuotes) { values.push(current.trim()); current = ''; }
+                    else { current += ch; }
+                }
+                values.push(current.trim());
+                return values;
+            };
+
+            const headers = parseRow(lines[0]).map(h => h.replace(/"/g, '').trim());
+            const colIdx = {};
+            ['Day', 'Department', 'Location', 'Product', 'Unit Sold', 'Price', 'Revenue', 'COGS'].forEach(h => {
+                const idx = headers.findIndex(hdr => hdr.toLowerCase().startsWith(h.toLowerCase()));
+                if (idx >= 0) colIdx[h] = idx;
+            });
+
+            if (colIdx['Day'] == null || colIdx['Location'] == null || colIdx['Product'] == null || colIdx['Unit Sold'] == null || colIdx['Price'] == null) {
+                throw new Error('Missing required columns: Day, Location, Product, Unit Sold, Price');
+            }
+
+            // Parse data rows, filter to Retail + active product set products
+            const rows = [];
+            for (let i = 1; i < lines.length; i++) {
+                const vals = parseRow(lines[i]);
+                if (vals.length < 5) continue;
+                const dept = colIdx['Department'] != null ? vals[colIdx['Department']].replace(/"/g, '') : 'Retail';
+                if (dept !== 'Retail') continue;
+
+                const product = vals[colIdx['Product']].replace(/"/g, '').trim();
+                if (!productNames.has(product)) continue;
+
+                const day = parseInt(vals[colIdx['Day']].replace(/"/g, ''));
+                const location = vals[colIdx['Location']].replace(/"/g, '').trim();
+                const unitSold = parseInt(vals[colIdx['Unit Sold']].replace(/"/g, ''));
+                const price = parseFloat(vals[colIdx['Price']].replace(/"/g, ''));
+                if (isNaN(day) || isNaN(unitSold) || isNaN(price)) continue;
+
+                rows.push({ day, location, product, unitSold, price });
+            }
+
+            if (rows.length === 0) {
+                throw new Error(`No matching Retail data found for ${set.label} products (${[...productNames].join(', ')})`);
+            }
+
+            // Group by Location → Product → { days: [{day, units, price}] }
+            const grouped = {};  // { location: { product: { days: Map<day, {totalUnits, price}> } } }
+            rows.forEach(r => {
+                if (!grouped[r.location]) grouped[r.location] = {};
+                if (!grouped[r.location][r.product]) grouped[r.location][r.product] = new Map();
+                const dayMap = grouped[r.location][r.product];
+                if (!dayMap.has(r.day)) {
+                    dayMap.set(r.day, { totalUnits: 0, price: r.price });
+                }
+                dayMap.get(r.day).totalUnits += r.unitSold;
+                dayMap.get(r.day).price = r.price;  // latest entry wins for same day
+            });
+
+            // For each location:
+            //   - Sales/d = average of total units per day (across all days)
+            //   - Price = price from the latest (highest) day
+            const locationNames = Object.keys(grouped).sort();
+            const maxDay = Math.max(...rows.map(r => r.day));
+
+            // Rebuild globalProducts from set defaults (ensure all products present)
+            globalProducts = set.globalDefaults.map(g => ({
+                ...g,
+                code: set.code_map[g.name] || '',
+            }));
+
+            // Build locations
+            locations = locationNames.map(locName => {
+                const locData = grouped[locName];
+                const items = globalProducts.map(gp => {
+                    const dayMap = locData[gp.name];
+                    let avgSales = 0;
+                    let latestPrice = set.defaultPrices ? (set.defaultPrices[gp.name] || 100) : 100;
+
+                    if (dayMap && dayMap.size > 0) {
+                        // Average daily sales
+                        let totalUnits = 0;
+                        dayMap.forEach(v => totalUnits += v.totalUnits);
+                        avgSales = Math.round(totalUnits / dayMap.size);
+
+                        // Price from latest day
+                        let latestDay = 0;
+                        dayMap.forEach((v, day) => {
+                            if (day > latestDay) {
+                                latestDay = day;
+                                latestPrice = v.price;
+                            }
+                        });
+                    }
+
+                    return {
+                        productName: gp.name,
+                        price: latestPrice,
+                        dailySales: avgSales,
+                        stock: 0,
+                    };
+                });
+
+                // Use existing space if available, otherwise 400
+                const existingLoc = set.defaultLocations.find(l => l.name === locName);
+                const space = existingLoc ? existingLoc.space : 400;
+
+                return { id: uid(), name: locName, space, items };
+            });
+
+            activeLocIdx = 0;
+            // Clear cache for current set so fresh import takes effect
+            delete stateCache[activeSetKey];
+            fullRender();
+
+            // Count stats
+            const totalDays = new Set(rows.map(r => r.day)).size;
+            showCsvStatus('success',
+                `✅ Imported <b>${fileName}</b> — ${locationNames.length} locations, ${productNames.size} products, ${totalDays} days (Day ${Math.min(...rows.map(r => r.day))}–${maxDay}). Sales/d = avg, Price = Day ${maxDay}.`);
+        }
 
         // ══════════════════════════════════════════════════════════════════════
         //  INIT
